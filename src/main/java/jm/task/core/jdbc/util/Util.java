@@ -1,22 +1,18 @@
 package jm.task.core.jdbc.util;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class Util {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/PP114";
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "root1";
-
-    private static final SessionFactory sessionFactory = buildSessionFactory();
-    private Session session;
-    private Transaction transaction;
 
     public Connection getConnection() {
         Connection connection = null;
@@ -28,41 +24,22 @@ public class Util {
         return connection;
     }
 
-    private static SessionFactory buildSessionFactory() {
+    public SessionFactory buildSessionFactory() {
         try {
-            return new Configuration().configure("hibernate.cfg.xml")
+            Properties settings = new Properties();
+            settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
+            settings.put(Environment.URL, "jdbc:mysql://localhost:3306/PP114");
+            settings.put(Environment.USER, "root");
+            settings.put(Environment.PASS, "root1");
+            settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL8Dialect");
+            settings.put(Environment.SHOW_SQL, "true");
+            settings.put(Environment.HBM2DDL_AUTO, "create");
+            settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+
+            return new Configuration().setProperties(settings)
                     .addAnnotatedClass(jm.task.core.jdbc.model.User.class).buildSessionFactory();
         } catch (ExceptionInInitializerError e) {
             throw new ExceptionInInitializerError(e);
-        }
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    public Session openTransactionSession() {
-        try {
-            session = sessionFactory.openSession();
-            transaction = session.beginTransaction();
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
-        }
-        return session;
-    }
-
-    public void closeTransactionSession() {
-        try {
-            transaction.commit();
-            session.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
         }
     }
 }
