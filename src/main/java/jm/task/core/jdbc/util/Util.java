@@ -28,12 +28,11 @@ public class Util {
         try {
             Properties settings = new Properties();
             settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
-            settings.put(Environment.URL, "jdbc:mysql://localhost:3306/PP114");
-            settings.put(Environment.USER, "root");
-            settings.put(Environment.PASS, "root1");
+            settings.put(Environment.URL, DB_URL);
+            settings.put(Environment.USER, DB_USERNAME);
+            settings.put(Environment.PASS, DB_PASSWORD);
             settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL8Dialect");
             settings.put(Environment.SHOW_SQL, "true");
-            settings.put(Environment.HBM2DDL_AUTO, "create");
             settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
 
             return new Configuration().setProperties(settings)
